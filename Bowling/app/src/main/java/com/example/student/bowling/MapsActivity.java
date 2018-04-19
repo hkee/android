@@ -24,6 +24,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -197,6 +199,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //위치정보 보내고 주변 볼링장 정보 받아오기
     class LocationTask extends AsyncTask<Double, String, String> {
+        String center[]=new String[15];
+        String rlat[]=new String[15];
+        String rlog[]=new String[15];
+        BufferedReader reader=null;
         String url;
         //constructor
         public LocationTask(){
@@ -226,6 +232,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if(con.getResponseCode()!=HttpURLConnection.HTTP_OK){
                         return null;
                     }
+                    reader  = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                    String line=null;
+                    while(true){
+                        line=reader.readLine();
+                        if(line==null){
+                            break;
+                        }
+                        sb.append(line);
+                    }
                 }
             }catch (Exception e){
                 return e.getMessage();
@@ -233,13 +248,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }finally {
                 con.disconnect();
             }
-            return "";
+            return sb.toString();
+           // return "";
 
         }
 
         @Override
         protected void onPostExecute(String s) {
-            super.onPostExecute(s);
+            mMap.clear();
+            LatLng lo[]=new LatLng[15];
+
+            String temp[]=s.split("/");
+            int c=Integer.parseInt(temp[temp.length-1]);
+            for(int i=1;i<=c;i++){
+                rlat[i]=temp[i];
+                rlog[i]=temp[i+c];
+                center[i]=temp[i+(c*2)];
+                lo[i]=new LatLng(Double.parseDouble(rlat[i]),Double.parseDouble(rlog[i]));
+                mMap.addMarker(new MarkerOptions().position(lo[i]).title(center[i]));
+            }
+
+            //Toast.makeText(MapsActivity.this, ""+center[1], Toast.LENGTH_SHORT).show();
         }
     }
 
