@@ -12,9 +12,11 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -25,6 +27,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -33,14 +36,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     LinearLayout second;
-    RelativeLayout first;
+    RelativeLayout first,register_page;
     LinearLayout lay_map;
     WebView web_dash;
     FrameLayout game_fm;
     private MarkerOptions mOpt;
     LocationTask locationTask;
+    LoginTask loginTask;
     Double slat,slog;
-
+    TextView tv_register;
+    EditText input_tel, input_pwd,input_name,input_id,login_id,login_pwd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,13 +60,47 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         web_dash=findViewById(R.id.web_dash);
         game_fm=findViewById(R.id.game_fm);
         lay_map=findViewById(R.id.lay_map);
+        input_id=findViewById(R.id.input_id);
+        input_tel=findViewById(R.id.input_tel);
+        input_pwd=findViewById(R.id.input_pwd);
+        input_name=findViewById(R.id.input_name);
+        login_id=findViewById(R.id.login_id);
+        login_pwd=findViewById(R.id.login_pwd);
+        register_page=findViewById(R.id.register_page);
+        tv_register=findViewById(R.id.tv_register);
+        tv_register.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                first.setVisibility(View.INVISIBLE);
+                second.setVisibility(View.INVISIBLE);
+                register_page.setVisibility(View.VISIBLE);
+                Toast.makeText(MapsActivity.this, "클릭됨", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    public void clickBt_reg_cancle(View v){
+        input_id.setText("");
+        input_name.setText("");
+        input_pwd.setText("");
+        input_tel.setText("");
+
+        first.setVisibility(View.VISIBLE);
+        second.setVisibility(View.INVISIBLE);
+        register_page.setVisibility(View.INVISIBLE);
     }
     public void clickBt_login(View v){
         //로그인 버튼
-    }
-    public void clickBt_register(View v){
+        String id = login_id.getText().toString();
+        String pwd = login_pwd.getText().toString();
+        //more safe to code
+        if(id == null || pwd == null || id.equals("") || pwd.equals("")){
+            return;
+        }
 
+        loginTask = new LoginTask("http://70.12.114.134/bowling/itsMe.do");
+        loginTask.execute(id.trim(), pwd.trim());
     }
+
     public void clickBt_map(View v){
 
         new Thread(r).start();
@@ -75,7 +114,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         public void run() {
 
                     //좌표를 가지고옴
-                    locationTask=new LocationTask("http://70.12.114.140/android/location.jsp");
+                    locationTask=new LocationTask("http://70.12.114.134/bowling/location.jsp");
 
                     locationTask.execute(slat,slog);
 
@@ -271,5 +310,86 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Toast.makeText(MapsActivity.this, ""+center[1], Toast.LENGTH_SHORT).show();
         }
     }
+
+
+    //로그인 처리부분
+    class LoginTask extends AsyncTask<String, String, String>{
+
+        String url;
+        //constructor
+        public LoginTask(){
+
+        }
+        public LoginTask(String url){
+            this.url = url;
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String id = strings[0];
+            String pwd = strings[1];
+            //To JSP
+            url += "?id="+id+"&pwd="+pwd;
+
+            //HTTP REQUEST
+            StringBuilder sb = new StringBuilder();
+            URL url;
+            HttpURLConnection con = null;
+            BufferedReader reader=null;
+            try{
+                url = new URL(this.url);
+                //Connection
+                con = (HttpURLConnection)url.openConnection();
+                if(con != null){
+                    con.setConnectTimeout(5000);
+                    con.setRequestMethod("GET");
+                    con.setRequestProperty("Accept","*/*");
+                    if(con.getResponseCode()!=HttpURLConnection.HTTP_OK){
+                        return null;
+                    }
+             /*       reader  = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                    String line=null;
+                    while(true){
+                        line=reader.readLine();
+                        if(line==null){
+                            break;
+                        }
+                        sb.append(line);
+                    }*/
+             return "";
+                }
+            }catch (Exception e){
+                return e.getMessage();
+            }finally {
+                try {
+                    if(reader !=null){
+                        reader.close();
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                con.disconnect();
+            }
+
+            return sb.toString();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            //Toast.makeText(MainActivity.this, "" + s, Toast.LENGTH_SHORT).show();
+            if(s.trim().equals("1")){
+                Toast.makeText(MapsActivity.this, "success", Toast.LENGTH_SHORT).show();
+            }else if(s.trim().equals("2")){
+                Toast.makeText(MapsActivity.this, "fail", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 
 }
