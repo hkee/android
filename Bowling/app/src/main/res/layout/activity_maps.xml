@@ -29,8 +29,80 @@
                     android:id="@+id/game_fm"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="invisible">
+                    android:visibility="visible">
 
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="visible">
+
+                        <EditText
+                            android:id="@+id/tx_gp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignStart="@+id/tx_gt"
+                            android:layout_below="@+id/bt_crgame"
+                            android:ems="10"
+                            android:hint="개설자 id를 입력하세요"
+                            android:inputType="textPersonName"
+                            android:visibility="invisible" />
+
+                        <EditText
+                            android:id="@+id/tx_gn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignStart="@+id/tx_gt"
+                            android:layout_centerVertical="true"
+                            android:ems="10"
+                            android:hint="게임 번호를 입력하세요"
+                            android:inputType="number"
+                            android:visibility="invisible" />
+
+                        <EditText
+                            android:id="@+id/tx_gt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_alignParentTop="true"
+                            android:layout_marginEnd="16dp"
+                            android:layout_marginTop="102dp"
+                            android:ems="10"
+                            android:hint="게임 타이틀을 입력하세요"
+                            android:inputType="textPersonName"
+                            android:visibility="invisible" />
+
+                        <Button
+                            android:id="@+id/bt_gst"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
+                            android:layout_centerHorizontal="true"
+                            android:layout_marginBottom="93dp"
+                            android:onClick="clickBt_gst"
+                            android:text="go go"
+                            android:textSize="18sp" />
+
+                        <Button
+                            android:id="@+id/bt_jogame"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignStart="@+id/bt_crgame"
+                            android:layout_centerVertical="true"
+                            android:onClick="clickBt_gj"
+                            android:text="게임 참가"
+                            android:textSize="18sp" />
+
+                        <Button
+                            android:id="@+id/bt_crgame"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_alignTop="@+id/tx_gt"
+                            android:layout_marginStart="33dp"
+                            android:onClick="clickBt_gc"
+                            android:text="게임 개설"
+                            android:textSize="18sp" />
+                    </RelativeLayout>
                 </FrameLayout>
 
                 <WebView
@@ -43,7 +115,8 @@
                     android:id="@+id/lay_map"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="invisible">
 
                     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
                         xmlns:map="http://schemas.android.com/apk/res-auto"
@@ -70,6 +143,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:onClick="clickBt_game"
                 android:text="게임" />
 
             <Button
@@ -234,7 +308,7 @@
             android:layout_alignBottom="@+id/textView9"
             android:layout_alignStart="@+id/input_id"
             android:ems="10"
-            android:inputType="textPersonName" />
+            android:inputType="phone" />
 
         <EditText
             android:id="@+id/input_id"
@@ -246,7 +320,7 @@
             android:layout_marginTop="35dp"
             android:ems="10"
             android:hint="이메일 형식으로 입력하세요"
-            android:inputType="textPersonName" />
+            android:inputType="textWebEmailAddress" />
 
         <EditText
             android:id="@+id/input_pwd"
@@ -255,7 +329,7 @@
             android:layout_alignBottom="@+id/textView7"
             android:layout_alignStart="@+id/input_id"
             android:ems="10"
-            android:inputType="textPersonName" />
+            android:inputType="textPassword" />
 
         <EditText
             android:id="@+id/input_name"
@@ -274,19 +348,20 @@
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="195dp"
             android:background="@drawable/back"
+            android:onClick="clickBt_register"
             android:text="회원가입"
             android:textColor="@android:color/white"
             android:textSize="24sp" />
 
         <Button
-            android:id="@+id/bt_cancle"
+            android:id="@+id/bt_cancel"
             android:layout_width="150dp"
             android:layout_height="43dp"
             android:layout_alignParentStart="true"
             android:layout_alignTop="@+id/success"
             android:layout_marginStart="26dp"
             android:background="@drawable/back"
-            android:onClick="clickBt_reg_cancle"
+            android:onClick="clickBt_reg_cancel"
             android:text="취소"
             android:textColor="@android:color/white"
             android:textSize="24sp" />

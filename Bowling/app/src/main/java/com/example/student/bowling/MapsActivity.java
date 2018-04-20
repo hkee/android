@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.EditText;
@@ -29,6 +30,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -43,9 +45,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private MarkerOptions mOpt;
     LocationTask locationTask;
     LoginTask loginTask;
+    RegisterTask registerTask;
     Double slat,slog;
     TextView tv_register;
     EditText input_tel, input_pwd,input_name,input_id,login_id,login_pwd;
+    EditText tx_gp,tx_gt,tx_gn;
+    String myId="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +71,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         input_name=findViewById(R.id.input_name);
         login_id=findViewById(R.id.login_id);
         login_pwd=findViewById(R.id.login_pwd);
+        tx_gp=findViewById(R.id.tx_gp);
+        tx_gn=findViewById(R.id.tx_gn);
+        tx_gt=findViewById(R.id.tx_gt);
         register_page=findViewById(R.id.register_page);
         tv_register=findViewById(R.id.tv_register);
         tv_register.setOnClickListener(new View.OnClickListener() {
@@ -78,7 +86,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
     }
-    public void clickBt_reg_cancle(View v){
+    //하단 게임 버튼
+    public void clickBt_game(View v){
+        game_fm.setVisibility(View.VISIBLE);
+        web_dash.setVisibility(View.INVISIBLE);
+        lay_map.setVisibility(View.INVISIBLE);
+    }
+
+    //게임 개설버튼
+    public void clickBt_gc(View v){
+        tx_gt.setVisibility(View.VISIBLE);
+        tx_gp.setVisibility(View.VISIBLE);
+        tx_gn.setVisibility(View.INVISIBLE);
+        tx_gp.setText(myId);
+        tx_gp.setEnabled(false);
+
+    }
+    //게임 참가버튼
+    public void clickBt_gj(View v){
+        tx_gt.setVisibility(View.INVISIBLE);
+        tx_gp.setVisibility(View.INVISIBLE);
+        tx_gn.setVisibility(View.VISIBLE);
+    }
+    public void clickBt_gst(View v){
+
+    }
+
+    //회원가입창 취소버튼
+    public void clickBt_reg_cancel(View v){
         input_id.setText("");
         input_name.setText("");
         input_pwd.setText("");
@@ -99,6 +134,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         loginTask = new LoginTask("http://70.12.114.134/bowling/itsMe.do");
         loginTask.execute(id.trim(), pwd.trim());
+    }
+    //회원가입 버튼
+    public void clickBt_register(View v){
+        String id = input_id.getText().toString();
+        String pwd = input_pwd.getText().toString();
+        String name =input_name.getText().toString();
+        String tel= input_tel.getText().toString();
+        //more safe to code
+        if(id == null || pwd == null || id.equals("") || pwd.equals("")|| name == null || tel == null || name.equals("") || tel.equals("")){
+            return;
+        }
+        registerTask=new RegisterTask("http://70.12.114.134/bowling/registerMember.do");
+        registerTask.execute(id.trim(),pwd.trim(),name.trim(),tel.trim());
+
     }
 
     public void clickBt_map(View v){
@@ -335,7 +384,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String pwd = strings[1];
             //To JSP
             url += "?id="+id+"&pwd="+pwd;
-
+            myId=id;
             //HTTP REQUEST
             StringBuilder sb = new StringBuilder();
             URL url;
@@ -352,7 +401,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if(con.getResponseCode()!=HttpURLConnection.HTTP_OK){
                         return null;
                     }
-             /*       reader  = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                    reader  = new BufferedReader(new InputStreamReader(con.getInputStream()));
                     String line=null;
                     while(true){
                         line=reader.readLine();
@@ -360,36 +409,125 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             break;
                         }
                         sb.append(line);
-                    }*/
-             return "";
+                    }
                 }
             }catch (Exception e){
                 return e.getMessage();
-            }finally {
-                try {
-                    if(reader !=null){
-                        reader.close();
-                    }
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            }finally {
                 con.disconnect();
             }
-
             return sb.toString();
+            // return "";
         }
 
         @Override
         protected void onPostExecute(String s) {
             //Toast.makeText(MainActivity.this, "" + s, Toast.LENGTH_SHORT).show();
             if(s.trim().equals("1")){
+
                 Toast.makeText(MapsActivity.this, "success", Toast.LENGTH_SHORT).show();
+                first.setVisibility(View.INVISIBLE);
+                second.setVisibility(View.VISIBLE);
+                register_page.setVisibility(View.INVISIBLE);
             }else if(s.trim().equals("2")){
+                myId="";
                 Toast.makeText(MapsActivity.this, "fail", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(MapsActivity.this, ""+s, Toast.LENGTH_SHORT).show();
             }
         }
     }
+    // 회원가입 처리부분
+    class RegisterTask extends AsyncTask<String, String, String>{
 
+        String url;
+        //constructor
+        public RegisterTask(){
+
+        }
+        public RegisterTask(String url){
+            this.url = url;
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String id = strings[0];
+            String pwd = strings[1];
+            String name = null;
+            try {
+                name = java.net.URLEncoder.encode(new String(strings[2].getBytes("UTF-8")));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            String tel=strings[3];
+            Log.d("------------1",name);
+
+            //To JSP
+            url += "?id="+id+"&pwd="+pwd+"&name="+name+"&tel="+tel;
+
+            //HTTP REQUEST
+            StringBuilder sb = new StringBuilder();
+            URL url;
+            HttpURLConnection con = null;
+            BufferedReader reader=null;
+            try{
+                url = new URL(this.url);
+                //Connection
+                con = (HttpURLConnection)url.openConnection();
+                if(con != null){
+                    con.setConnectTimeout(5000);
+                    con.setRequestMethod("POST");
+                    con.setRequestProperty("Accept","*/*");
+                    Log.d("------------1-1",name);
+
+                    if(con.getResponseCode()!=HttpURLConnection.HTTP_OK){
+                        Log.d("getResponseCode","ERROR");
+
+                        return null;
+                    }
+                    reader  = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                    String line=null;
+                    while(true){
+                        line=reader.readLine();
+                        if(line==null){
+                            break;
+                        }
+                        sb.append(line);
+                    }
+                }
+            }catch (Exception e){
+                Log.d("------------2",e.getMessage());
+
+                return e.getMessage();
+
+            }finally {
+                con.disconnect();
+            }
+            return sb.toString();
+            // return "";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            Log.d("------------3",s);
+            //Toast.makeText(MainActivity.this, "" + s, Toast.LENGTH_SHORT).show();
+            if(s.trim().equals("1")){
+                first.setVisibility(View.VISIBLE);
+                second.setVisibility(View.INVISIBLE);
+                register_page.setVisibility(View.INVISIBLE);
+                Toast.makeText(MapsActivity.this, "회원가입에 성공하였습니다", Toast.LENGTH_SHORT).show();
+            }else if(s.trim().equals("2")){
+                Toast.makeText(MapsActivity.this, "이미 사용중인 아이디 입니다", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(MapsActivity.this, ""+s, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
 }
