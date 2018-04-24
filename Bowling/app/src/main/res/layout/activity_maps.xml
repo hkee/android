@@ -29,7 +29,7 @@
                     android:id="@+id/game_fm"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="visible">
+                    android:visibility="invisible">
 
                     <LinearLayout
                         android:id="@+id/lay_input"
@@ -775,7 +775,7 @@
                     android:id="@+id/web_dash"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="invisible" />
+                    android:visibility="visible" />
 
                 <LinearLayout
                     android:id="@+id/lay_map"

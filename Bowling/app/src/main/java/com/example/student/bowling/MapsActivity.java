@@ -609,6 +609,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 first.setVisibility(View.INVISIBLE);
                 second.setVisibility(View.VISIBLE);
                 register_page.setVisibility(View.INVISIBLE);
+
             }else if(s.trim().equals("2")){
                 myId="";
                 Toast.makeText(MapsActivity.this, "fail", Toast.LENGTH_SHORT).show();
@@ -788,7 +789,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                  g_master=temp[3];
                  g_date=temp[4];
                 //Toast.makeText(MapsActivity.this, ""+g_num+" "+g_title+" "+g_master+" "+g_date, Toast.LENGTH_SHORT).show();
-                tv_sum.setText(g_title+"/"+g_master);
+                tv_sum.setText("방번호:"+g_num+"/"+g_title+"/"+g_master);
             }
         }
     }
@@ -876,8 +877,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 g_title=temp[2];
                 g_master=temp[3];
                 g_date=temp[4].substring(0,temp[4].lastIndexOf(" ")+1);
-                tv_sum.setText(g_title+"/"+g_master);
-
+                tv_sum.setText("방번호:"+g_num+"/"+g_title+"/"+g_master);
 
                 //Toast.makeText(MapsActivity.this, ""+g_num+" "+g_title+" "+g_master+" "+g_date, Toast.LENGTH_SHORT).show();
             }
