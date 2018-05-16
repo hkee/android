@@ -3,4 +3,4 @@
 
 Screenshots
 ===========
-![img1](https://github.com/hkee/adroid/img1.jpg)
+![img1](https://github.com/hkee/android/blob/master/img1.JPG)
