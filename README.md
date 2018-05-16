@@ -1,5 +1,5 @@
 # android project - bowling score management App
-================================================
+
 
 Screenshots
 ===========
